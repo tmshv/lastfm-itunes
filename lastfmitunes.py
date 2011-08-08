@@ -1,13 +1,14 @@
-from appscript import *
 import re
 from urllib import quote
 import urllib2
-from BeautifulSoup import BeautifulStoneSoup
 import sys
+from appscript import *
+from lxml import etree
 
 try:
 	username = sys.argv[1]
 except:
+	print 'username not found'
 	exit()
 
 def load_resource(url):
@@ -25,10 +26,10 @@ def get_last_fm_track(artist, album, title):
 	return load_resource(url)
 
 def get_play_count_from_xml(xml_raw):
-	xml = BeautifulStoneSoup(xml_raw)
-	track = xml('track')[0]
+	xmlroot = etree.XML(xml_raw)
 	try:
-		count = int(track('userplaycount')[0].string)
+		upc = xmlroot.xpath('/lfm/track/userplaycount')[0]
+		count = int(upc.text)
 	except:
 		count = 0
 	return count
