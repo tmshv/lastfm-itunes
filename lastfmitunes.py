@@ -1,14 +1,14 @@
-# coding=<UTF-8>
-
-# class LTTrack:
-# 	itunesTrack
-# 	def __init__(self):
-		
 from appscript import *
 import re
 from urllib import quote
 import urllib2
 from BeautifulSoup import BeautifulStoneSoup
+import sys
+
+try:
+	username = sys.argv[1]
+except:
+	exit()
 
 def load_resource(url):
 	response = urllib2.urlopen(url)
@@ -20,16 +20,13 @@ def get_last_fm_track(artist, album, title):
 	url = re.sub('<key>', 'b25b959554ed76058ac220b7b2e0a026', url)
 	url = re.sub('<artist>', quote(artist), url)
 	url = re.sub('<title>', quote(title), url)
-	url = re.sub('<user>', 'mrpoma', url)
+	url = re.sub('<user>', username, url)
 	url = re.sub('<correction>', '1', url)
-	# return url
-	# print url
 	return load_resource(url)
 
 def get_play_count_from_xml(xml_raw):
 	xml = BeautifulStoneSoup(xml_raw)
 	track = xml('track')[0]
-	# print track
 	try:
 		count = int(track('userplaycount')[0].string)
 	except:
@@ -53,6 +50,5 @@ for t in list:
 	n = t.name.get().encode('UTF-8')
 	resp = get_last_fm_track(a, al, n)
 	count = get_play_count_from_xml(resp)
-	print a+' - '+al+' - '+n+' ('+str(count)+')'
 	if count > 0:
 		update_itunes_track(t, count)
